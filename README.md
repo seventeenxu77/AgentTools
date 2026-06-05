@@ -1,13 +1,14 @@
 # AgentTools
 
-两个互补的 **Claude Code 增强工具**，解决「长会话 / 跨 compact / 跨窗口」场景下的上下文丢失与任务不可追溯问题。
+一组 **Claude Code 增强工具**，解决「长会话 / 跨 compact / 跨窗口」场景下的上下文丢失、任务不可追溯，以及开发工作流复用问题。
 
 | 工具 | 定位 | 服务对象 | 平台依赖 | 详细文档 |
 |------|------|---------|---------|---------|
 | **[session-state](session-state/)** | 让 agent 跨 compact / 跨窗口「记得高层任务状态」（续命） | **模型** | `bash` + `jq`（跨平台，Windows 需 Git Bash） | [session-state/README.md](session-state/README.md) |
 | **[task-trace](task-trace/)** | 把会话工具调用轨迹聚合成 mermaid 任务图，可视化审查 / 回溯（可观测性） | **人** | **PowerShell（Windows 优先）** | [task-trace/README.md](task-trace/README.md) |
+| **[workflow-commands](workflow-commands/)** | 通用开发工作流 slash 命令（bug 定位 / 复盘 / 执行设计文档），不绑项目/语言 | **人 + 模型** | 无（纯提示词） | [workflow-commands/README.md](workflow-commands/README.md) |
 
-两个工具**彼此独立、可单装**，也能协同（见下）。
+三个工具**彼此独立、可单装**，也能协同（见下）。
 
 ---
 
@@ -36,6 +37,7 @@ compact 后：① 读 state.md 恢复任务         ② 读 _distilled.md 恢复
 ```
 
 > `session-state` 的「Context 管理规程」第 4 步会调用 `task-trace` 的 distill 脚本。**没装 task-trace 时该步自动跳过**，session-state 仍独立可用。
+> `workflow-commands` 与前两者无依赖，是纯提示词命令包，可单独取用。
 
 ---
 
@@ -62,12 +64,18 @@ AgentTools/
 │  ├─ README.md               #   详细搭载（手动 + 提示词）
 │  ├─ hooks/                  #   5 个 bash hook
 │  ├─ settings.hooks.json     #   settings.local.json 的 hooks 片段（供合并）
-│  └─ CLAUDE.snippet.md       #   两节行为规程（供粘贴进 CLAUDE.md）
-└─ task-trace/                # 工具 B：任务轨迹（transcript → mermaid）
+│  ├─ CLAUDE.snippet.md       #   两节行为规程（供粘贴进 CLAUDE.md）
+│  └─ commands/               #   配套命令：session-clear / stop
+├─ task-trace/                # 工具 B：任务轨迹（transcript → mermaid）
+│  ├─ README.md
+│  ├─ SKILL.md                #   /trace skill 定义
+│  ├─ DESIGN.md               #   设计依据与取舍（v1–v5 演进）
+│  └─ scripts/                #   4 个 PowerShell 脚本
+└─ workflow-commands/         # 工具 C：通用开发工作流命令（纯提示词）
    ├─ README.md
-   ├─ SKILL.md                #   /trace skill 定义
-   ├─ DESIGN.md               #   设计依据与取舍（v1–v5 演进）
-   └─ scripts/                #   4 个 PowerShell 脚本
+   ├─ debug.md                #   /debug  bug 定位修复流程
+   ├─ bugreview.md            #   /bugreview  修复复盘报告
+   └─ zx.md                   #   /zx  执行设计文档
 ```
 
 ---
