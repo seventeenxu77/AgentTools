@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/session-init.sh" }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/session-archive.sh" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/track-file-access.sh", "async": true }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/error-loop-guard.sh" }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/context-warning.sh" }
+        ]
+      }
+    ]
+  }
+}
