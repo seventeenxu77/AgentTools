@@ -22,15 +22,17 @@
         ]
       },
       {
-        "matcher": "Bash",
-        "hooks": [
-          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/error-loop-guard.sh" }
-        ]
-      },
-      {
         "matcher": "",
         "hooks": [
           { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/context-warning.sh" }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/error-loop-guard.sh" }
         ]
       }
     ]

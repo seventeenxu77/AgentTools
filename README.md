@@ -62,7 +62,7 @@ AgentTools/
 ├─ LICENSE
 ├─ session-state/             # 工具 A：上下文管理（hook 驱动）
 │  ├─ README.md               #   详细搭载（手动 + 提示词）
-│  ├─ hooks/                  #   5 个 bash hook
+│  ├─ hooks/                  #   5 个 bash hook + error_fp.py（指纹辅助）
 │  ├─ settings.hooks.json     #   settings.local.json 的 hooks 片段（供合并）
 │  ├─ CLAUDE.snippet.md       #   两节行为规程（供粘贴进 CLAUDE.md）
 │  └─ commands/               #   配套命令：session-clear / stop

@@ -24,9 +24,11 @@
 |-----------|------|---------|------|------|
 | SessionStart | `session-init.sh` | — | sync | 建 `.claude/sessions/<sid>/` + `.heartbeat`；清理 `history/` 下 3 天前旧目录；输出三行 `[SESSION]` 路径 |
 | PostToolUse | `context-warning.sh` | `""`（全工具） | sync | 从 transcript 读**真实** token（input + cache 两类），按 model 映射 context window，超 70% 注入 `[HOOK:CONTEXT_WARN]`，60s 节流 |
-| PostToolUse | `error-loop-guard.sh` | `Bash` | sync | 正则识别 Bash 报错，连续 3 次 `decision:block` + 注入 `[HOOK:ERROR_LOOP]` 强制停 |
+| **PostToolUseFailure** | `error-loop-guard.sh` + `error_fp.py` | `Bash` | sync | 命令**真失败(exit≠0)**时触发，`error_fp.py` 把 `.error` 归一化成指纹，**同一个失败累计 3 次**注入 `[HOOK:ERROR_LOOP]` 提醒 |
 | PostToolUse | `track-file-access.sh` | `Read\|Edit\|Write` | **async** | 把 `[时间] TOOL 路径` 追加进 `files.log`，供写 state.md 时筛关键文档 |
 | SessionEnd | `session-archive.sh` | — | sync | 会话结束把 `sessions/<sid>` 移到 `sessions/history/<sid>` 归档 |
+
+> **为什么 `error-loop-guard` 挂在 `PostToolUseFailure` 而不是 `PostToolUse`**：实测确认 Bash 命令 `exit≠0` 走 `PostToolUseFailure`（stdin 带 `.error` 字段 = `"Exit code N\n<stderr>"`），`exit 0` 才走 `PostToolUse`（`.tool_response` 是 `{stdout,stderr,...}` 对象、无退出码字段）。早期版本误挂 `PostToolUse` + grep 输出找 error 字样，结果**收不到真失败**（去了 PostToolUseFailure）、反而把**输出里含 "error" 字样的成功命令**误判为失败。现版本挂对事件，并用 `error_fp.py` 按指纹去重——同一个失败累计 3 次才提醒，不同失败分开计数，零误报。`error_fp.py` 是 `error-loop-guard.sh` 调用的辅助脚本（归一化 + 计数），不单独注册为 hook。
 
 ### 状态文件（全在 `.claude/sessions/<sid>/`，compact 碰不到的磁盘上）
 
